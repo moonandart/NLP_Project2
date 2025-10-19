@@ -1,0 +1,85 @@
+# ===============================
+# .gitignore for IndoBERT Sentiment Project
+# ===============================
+
+# --- Python / Colab Caches ---
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.bak
+.DS_Store
+.env
+.venv
+*.log
+
+# --- Colab / Temporary Files ---
+*.tmp
+*.temp
+*.lock
+*.part
+*.bak
+*.old
+.cache/
+*.egg-info/
+
+# --- Output / Artifacts (too large for GitHub) ---
+outputs/
+best_model/
+*.bin
+*.pt
+*.ckpt
+*.tar.gz
+*.joblib
+*.pkl
+*.npy
+*.npz
+*.onnx
+*.h5
+*.tflite
+*.zip
+
+# --- Dataset / Data Samples (optional privacy) ---
+data/*.csv
+data/*.jsonl
+data/*.tsv
+data/*.xlsx
+data/*.txt
+
+# --- Hugging Face / Transformers Cache ---
+~/.cache/
+~/.huggingface/
+huggingface/
+transformers_cache/
+datasets_cache/
+*.arrow
+*.lock
+
+# --- VSCode / IDE Files ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Jupyter Notebook Checkpoints ---
+.ipynb_checkpoints/
+
+# --- System Files ---
+Thumbs.db
+desktop.ini
+
+# --- Local Test Artifacts ---
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.pdf
+
+# --- Optional: Allow key visuals for README ---
+!outputs/confusion_matrix_test.png
+!outputs/test_metrics.json
+!outputs/label_maps.json
+!outputs/classification_report.txt

@@ -1,0 +1,23 @@
+# ==========================================
+# IndoBERT Sentiment Analysis Requirements
+# ==========================================
+
+# --- Core NLP Libraries ---
+transformers==4.44.2
+datasets==2.21.0
+accelerate==0.34.2
+
+# --- Machine Learning & Evaluation ---
+scikit-learn==1.5.2
+matplotlib==3.9.2
+
+# --- Tokenization / Text Processing ---
+sentencepiece==0.2.0
+
+# --- Data Handling ---
+pandas>=2.2.2
+numpy>=1.26.0
+pyarrow==19.0.0  # pinned to avoid RAPIDS conflicts
+
+# --- Utilities ---
+jedi>=0.19.1     # required by IPython
