@@ -1,6 +1,7 @@
 # 🇮🇩 IndoBERT Sentiment Analysis (Version 1)
 
-Fine-tuning **IndoBERT** (`indobenchmark/indobert-base-p1`) for **Indonesian sentiment classification** using tweet data.  
+Fine-tuning **IndoBERT** (`indobenchmark/indobert-base-p1`) for **Indonesian sentiment classification** using tweet data.
+
 This repository contains two Google Colab–ready notebooks:
 
 | Notebook | Purpose |
@@ -35,15 +36,23 @@ Sentiment_IndoBERT/
 │   ├── IndoBERT_V1.ipynb               # Full fine-tuning & evaluation
 │   └── IndoBERT_Inference_V1.ipynb     # Inference-only version
 │
-├── README.md                           # This file
-└── (optional outputs on Drive)
-    ├── best_model/                     # Saved fine-tuned model + tokenizer
-    ├── label_maps.json
-    ├── classification_report.txt
-    ├── test_metrics.json
-    ├── confusion_matrix_test.png
-    └── predictions_*.csv
+├── outputs/                            # (optional) commit selected small files only
+│   ├── label_maps.json
+│   ├── classification_report.txt
+│   ├── test_metrics.json
+│   ├── confusion_matrix_test.png
+│   └── best_model/                     # (large) model weights + tokenizer — usually not committed
+│
+├── data/                               # (optional) dataset folder
+│   └── tweet.csv
+│
+├── README.md
+├── requirements.txt
+└── .gitignore
 ```
+
+> **Note:** The notebooks save artifacts to your Google Drive at  
+> `/content/drive/MyDrive/Proyek/Sentiment_IndoBERT/`
 
 ---
 
@@ -55,7 +64,7 @@ Sentiment_IndoBERT/
 | **OUTPUT_DIR** | `/content/drive/MyDrive/Proyek/Sentiment_IndoBERT` |
 | **MODEL_DIR (for inference)** | `/content/drive/MyDrive/Proyek/Sentiment_IndoBERT/best_model` |
 
-> Make sure your `tweet.csv` file has two columns:  
+> Ensure your `tweet.csv` has columns:  
 > `tweet` → text input, and `sentimen` → label (`positif`, `netral`, `negatif`).
 
 ---
@@ -63,22 +72,20 @@ Sentiment_IndoBERT/
 ## 🚀 How to Run (Training)
 
 1. Open **[`notebooks/IndoBERT_V1.ipynb`](notebooks/IndoBERT_V1.ipynb)** in **Google Colab**.
-2. Run all cells in order:
-   - Mount Google Drive  
-   - Confirm dataset path  
-   - Train IndoBERT (≈ 3 epochs by default)
-3. Wait until the notebook prints final metrics:
-   - **Accuracy**, **Precision**, **Recall**, **Macro-F1**
-4. Check Drive folder for outputs:
-   - `/best_model/`, `classification_report.txt`, `test_metrics.json`, `confusion_matrix_test.png`
+2. Run **Process 1** (Clean Install). If prompted, **restart runtime** after installs.
+3. Run **Process 2–9** in order (mount Drive, config, load/encode, split, tokenize, train, evaluate, export).
+4. Review the outputs in Drive:
+   - `/best_model/` (model + tokenizer)
+   - `label_maps.json`, `test_metrics.json`, `classification_report.txt`
+   - `confusion_matrix_test.png`
 
-Example classification report snippet:
+**Example classification report** (illustrative):
 
 ```
               precision    recall  f1-score   support
     negatif      0.613     0.706     0.656       119
      netral      0.640     0.603     0.621       121
-    positif     0.625     0.569     0.596       123
+    positif      0.625     0.569     0.596       123
    macro avg    0.626     0.626     0.624       363
    accuracy                          0.625       363
 ```
@@ -88,10 +95,9 @@ Example classification report snippet:
 ## 🔍 How to Run (Inference Only)
 
 1. Open **[`notebooks/IndoBERT_Inference_V1.ipynb`](notebooks/IndoBERT_Inference_V1.ipynb)**.
-2. Make sure your fine-tuned model exists in:  
-   `/content/drive/MyDrive/Proyek/Sentiment_IndoBERT/best_model`
+2. Confirm your model exists at: `/content/drive/MyDrive/Proyek/Sentiment_IndoBERT/best_model`.
 3. Run **Process 1–3** to install dependencies, mount Drive, and load model.
-4. Use the helper function:
+4. Predict directly in Python:
 
 ```python
 predict_texts([
@@ -99,22 +105,16 @@ predict_texts([
     "Biasa saja sih, tidak terlalu istimewa.",
     "Sangat buruk, saya kecewa."
 ])
+# -> ['positif', 'netral', 'negatif']
 ```
 
-Expected output:
-
-```python
-['positif', 'netral', 'negatif']
-```
-
-5. To predict from a CSV:
+5. Predict from a CSV:
 
 ```python
 CSV_PATH = "/content/drive/MyDrive/Proyek/Sentiment_IndoBERT/Data/tweet.csv"
 TEXT_COL = "tweet"
 ```
-
-→ Saves `predictions_YYYYMMDD_HHMMSS.csv` to your project folder.
+Outputs a file like `predictions_YYYYMMDD_HHMMSS.csv` to your Drive project folder.
 
 ---
 
@@ -138,21 +138,20 @@ TEXT_COL = "tweet"
 
 - **best_model/** – Saved weights + tokenizer  
 - **label_maps.json** – `label2id` & `id2label` mappings  
-- **classification_report.txt** – Precision / Recall / F1 per class  
-- **test_metrics.json** – Numeric metrics summary  
-- **confusion_matrix_test.png** – Visual evaluation  
-- **predictions_*.csv** – Batch inference results  
+- **classification_report.txt** – per-class Precision / Recall / F1  
+- **test_metrics.json** – overall metrics summary  
+- **confusion_matrix_test.png** – visual evaluation  
+- **predictions_*.csv** – batch inference results  
 
 ---
 
-## 💡 Tips
+## 💡 Tips & Troubleshooting
 
-- To improve performance:
-  - Increase `EPOCHS` to 4–5 and monitor overfitting.
-  - Adjust `LR` between `2e-5` → `3e-5`.
-  - Use `MAX_LEN = 192` for longer texts.
-- Use GPU runtime (`T4` / `A100`) on Colab.
-- The Trainer automatically keeps the **best checkpoint** by macro-F1.
+- **Dependency conflicts in Colab**: The training notebook includes a robust **Process 1** that removes RAPIDS/dask/gcsfs, pins `pyarrow==19.0.0`, installs NLP libs, and runs `pip check`.
+- **Longer texts**: Increase `MAX_LEN` to `192` (slower but may improve recall).
+- **More training**: Raise `EPOCHS` to 4–5 (monitor validation macro-F1).
+- **GPU**: Use T4/A100 on Colab for faster training.
+- **Large files**: Don’t commit `best_model/` to GitHub; use `.gitignore`.
 
 ---
 
@@ -173,19 +172,11 @@ If you use this project, please cite:
 
 ## 🧩 Dependencies
 
-- Python ≥ 3.9  
-- `transformers`  
-- `datasets`  
-- `accelerate`  
-- `scikit-learn`  
-- `matplotlib`  
-- `sentencepiece`
-
-Install (Colab):
-
-```bash
-!pip install -q transformers datasets accelerate scikit-learn matplotlib sentencepiece
-```
+See [`requirements.txt`](requirements.txt). For Colab, the training notebook’s **Process 1** installs:
+- `transformers`, `datasets<3.0.0`, `accelerate`
+- `scikit-learn`, `matplotlib`, `sentencepiece`
+- `pyarrow==19.0.0` (pinned)
+- `jedi` (for IPython completeness)
 
 ---
 
@@ -193,4 +184,4 @@ Install (Colab):
 
 **Aris (moonandart)**  
 AI & NLP enthusiast — exploring sentiment analysis, BERT fine-tuning, and contextual AI tools.  
-🔗 [GitHub](https://github.com/moonandart)
+🔗 https://github.com/moonandart
